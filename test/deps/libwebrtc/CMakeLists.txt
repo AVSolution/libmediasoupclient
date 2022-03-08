@@ -1,12 +1,13 @@
 set(SOURCE_FILES
 	pc/test/fake_audio_capture_module.cc
+	pc/test/fake_audio_capture_module.h
 )
 
 # Create target.
 add_library(webrtc STATIC ${SOURCE_FILES})
 
 # Private (implementation) header files.
-target_include_directories(webrtc PRIVATE ${PROJECT_SOURCE_DIR}/deps/libwebrtc)
+target_include_directories(webrtc PRIVATE ${PROJECT_SOURCE_DIR}/test/deps/libwebrtc)
 
 # Public (interface) headers from dependencies.
 target_include_directories(webrtc PUBLIC

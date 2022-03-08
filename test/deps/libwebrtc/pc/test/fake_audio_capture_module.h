@@ -24,7 +24,8 @@
 
 #include "api/scoped_refptr.h"
 #include "modules/audio_device/include/audio_device.h"
-#include "rtc_base/critical_section.h"
+//#include "rtc_base/critical_section.h"
+#include "rtc_base//deprecated/recursive_critical_section.h"
 #include "rtc_base/message_handler.h"
 
 namespace rtc {
@@ -219,10 +220,10 @@ class FakeAudioCaptureModule : public webrtc::AudioDeviceModule,
 
   // Protects variables that are accessed from process_thread_ and
   // the main thread.
-  rtc::CriticalSection crit_;
+  rtc::RecursiveCriticalSection crit_;
   // Protects |audio_callback_| that is accessed from process_thread_ and
   // the main thread.
-  rtc::CriticalSection crit_callback_;
+  rtc::RecursiveCriticalSection crit_callback_;
 };
 
 #endif  // PC_TEST_FAKE_AUDIO_CAPTURE_MODULE_H_

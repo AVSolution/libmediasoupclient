@@ -22,6 +22,8 @@ int main(int argc, char* argv[])
 	  | Catch::clara::Opt(webrtcLogLevelStr, "verbose|info|warn|error|none")["-W"]["--webrtc-log-level"]("libwebrtc log level (default: none)");
 	// clang-format on
 
+	logLevelStr = "debug";
+	webrtcLogLevelStr = "info";
 	// Now pass the new composite back to Catch so it uses that.
 	session.cli(cli);
 
@@ -30,6 +32,7 @@ int main(int argc, char* argv[])
 
 	if (ret != 0) // Indicates a command line error.
 		return ret;
+
 
 	// Apply log levels.
 	if (logLevelStr == "debug")
@@ -49,7 +52,12 @@ int main(int argc, char* argv[])
 		webrtcLogLevel = rtc::LoggingSeverity::LS_ERROR;
 
 	mediasoupclient::Logger::SetLogLevel(logLevel);
-	mediasoupclient::Logger::SetHandler(new mediasoupclient::Logger::DefaultLogHandler());
+	//mediasoupclient::Logger::SetHandler(new mediasoupclient::Logger::DefaultLogHandler());
+	mediasoupclient::Logger::SetDefaultHandler();
+	//mediasoupclient::Logger::setLogFilter("F:/workspace/avsolution/libmediasoupclient/build/test/Release/mediasoup.log");
+	mediasoupclient::Logger::setLogFilter("mediasoup.log");
+
+	MSC_DEBUG("mediasoupclient version: %s %s %s", mediasoupclient::Version().c_str(), logLevelStr.c_str(), webrtcLogLevelStr.c_str());
 
 	rtc::LogMessage::LogToDebug(webrtcLogLevel);
 

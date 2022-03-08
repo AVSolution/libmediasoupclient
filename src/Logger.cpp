@@ -10,6 +10,7 @@ namespace mediasoupclient
 	Logger::LogHandlerInterface* Logger::handler{ nullptr };
 	char Logger::buffer[Logger::bufferSize];
 	Logger::LogLevel Logger::logLevel = Logger::LogLevel::LOG_NONE;
+	std::ofstream Logger::logFilter;
 
 	/* Class methods. */
 
@@ -28,10 +29,18 @@ namespace mediasoupclient
 		Logger::handler = new Logger::DefaultLogHandler();
 	}
 
+	void Logger::setLogFilter(const std::string& filepath)
+	{
+		if (!logFilter.is_open()) {
+			logFilter.open(filepath);
+		}
+	}
+
 	/* DefaultLogHandler */
 
 	void Logger::DefaultLogHandler::OnLog(LogLevel /*level*/, char* payload, size_t /*len*/)
 	{
 		std::cout << payload << std::endl;
+		logFilter << payload<<std::endl;
 	}
 } // namespace mediasoupclient

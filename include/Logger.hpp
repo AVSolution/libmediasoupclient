@@ -47,6 +47,7 @@
 #include <cstdio>  // std::snprintf(), std::fprintf(), stdout, stderr
 #include <cstdlib> // std::abort()
 #include <cstring>
+#include <fstream>
 
 namespace mediasoupclient
 {
@@ -76,12 +77,14 @@ namespace mediasoupclient
 		static void SetLogLevel(LogLevel level);
 		static void SetHandler(LogHandlerInterface* handler);
 		static void SetDefaultHandler();
+		static void setLogFilter(const std::string& filepath);
 
 	public:
 		static LogLevel logLevel;
 		static LogHandlerInterface* handler;
 		static const size_t bufferSize{ 50000 };
 		static char buffer[];
+		static std::ofstream logFilter;
 	};
 } // namespace mediasoupclient
 
@@ -92,6 +95,9 @@ namespace mediasoupclient
 using Logger = mediasoupclient::Logger;
 
 #define _MSC_LOG_SEPARATOR_CHAR "\n"
+#ifndef MSC_CLASS
+#define MSC_CLASS "default classname "
+#endif
 
 #ifdef MSC_LOG_FILE_LINE
 	#define _MSC_LOG_STR " %s:%d | %s::%s()"
