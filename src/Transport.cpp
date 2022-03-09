@@ -420,7 +420,7 @@ namespace mediasoupclient
 		else if (!rtpParameters)
 			MSC_THROW_TYPE_ERROR("missing rtpParameters");
 		else if (!appData.is_object())
-			MSC_THROW_TYPE_ERROR("appData must be a JSON object");
+			;//MSC_THROW_TYPE_ERROR("appData must be a JSON object");
 		else if (!ortc::canReceive(*rtpParameters, *this->extendedRtpCapabilities))
 			MSC_THROW_UNSUPPORTED_ERROR("cannot consume this Producer");
 
