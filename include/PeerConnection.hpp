@@ -5,6 +5,8 @@
 #include <api/peer_connection_interface.h> // webrtc::PeerConnectionInterface
 #include <future>                          // std::promise, std::future
 #include <memory>                          // std::unique_ptr
+#include <modules/audio_device/include/audio_device_data_observer.h> // AudioDeviceDataObserver
+
 
 namespace mediasoupclient
 {
@@ -48,6 +50,23 @@ namespace mediasoupclient
 			void OnInterestingUsage(int usagePattern) override;
 		};
 
+		class PrivateAudioObserver
+		{
+		public:
+			virtual ~PrivateAudioObserver(){;}
+			virtual bool onCaptureAudioFrame(
+			  const void* audio_samples,
+			  const size_t num_samples,
+			  const size_t bytes_per_sample,
+			  const size_t num_channels,
+			  const uint32_t samples_per_sec)   = 0;
+			virtual bool onPlaybackAudioFrame(
+			  const void* audio_samples,
+			  const size_t num_samples,
+			  const size_t bytes_per_sample,
+			  const size_t num_channels,
+			  const uint32_t samples_per_sec) = 0;
+		};
 		class SetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver
 		{
 		public:
@@ -100,6 +119,30 @@ namespace mediasoupclient
 			std::promise<nlohmann::json> promise;
 		};
 
+		class AudioFrameObserver final: public webrtc::AudioDeviceDataObserver
+		{
+		public:
+			AudioFrameObserver(PrivateAudioObserver* pObserver) : pObserver_(pObserver){;}
+			~AudioFrameObserver(){;}
+
+			virtual void OnCaptureData(
+			  const void* audio_samples,
+			  const size_t num_samples,
+			  const size_t bytes_per_sample,
+			  const size_t num_channels,
+			  const uint32_t samples_per_sec) override;
+
+			virtual void OnRenderData(
+			  const void* audio_samples,
+			  const size_t num_samples,
+			  const size_t bytes_per_sample,
+			  const size_t num_channels,
+			  const uint32_t samples_per_sec) override;
+
+		private:
+			PrivateAudioObserver* pObserver_;
+		};
+
 	public:
 		struct Options
 		{
@@ -108,7 +151,10 @@ namespace mediasoupclient
 		};
 
 	public:
-		PeerConnection(PrivateListener* privateListener, const Options* options);
+		PeerConnection(
+		  PrivateListener* privateListener,
+		  const Options* options,
+		  PrivateAudioObserver* pObserver = nullptr);
 		~PeerConnection() = default;
 
 		void Close();

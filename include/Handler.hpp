@@ -41,6 +41,7 @@ namespace mediasoupclient
 	public:
 		explicit Handler(
 		  PrivateListener* privateListener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
@@ -86,8 +87,8 @@ namespace mediasoupclient
 		};
 
 	public:
-		SendHandler(
-		  Handler::PrivateListener* privateListener,
+		SendHandler(Handler::PrivateListener* privateListener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,
@@ -129,6 +130,7 @@ namespace mediasoupclient
 	public:
 		RecvHandler(
 		  Handler::PrivateListener* privateListener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
 		  const nlohmann::json& dtlsParameters,

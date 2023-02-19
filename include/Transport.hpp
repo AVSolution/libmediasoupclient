@@ -113,6 +113,7 @@ namespace mediasoupclient
 	private:
 		SendTransport(
 		  Listener* listener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
@@ -181,6 +182,7 @@ namespace mediasoupclient
 	private:
 		RecvTransport(
 		  Listener* listener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,

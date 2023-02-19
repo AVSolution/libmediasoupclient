@@ -115,6 +115,7 @@ namespace mediasoupclient
 
 	SendTransport* Device::CreateSendTransport(
 	  SendTransport::Listener* listener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const std::string& id,
 	  const json& iceParameters,
 	  const json& iceCandidates,
@@ -141,6 +142,7 @@ namespace mediasoupclient
 		// Create a new Transport.
 		auto* transport = new SendTransport(
 		  listener,
+		  privateAudioObserver,
 		  id,
 		  iceParameters,
 		  iceCandidates,
@@ -166,11 +168,12 @@ namespace mediasoupclient
 		MSC_TRACE();
 
 		return Device::CreateSendTransport(
-		  listener, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
+		  listener, nullptr,id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
 	}
 
 	RecvTransport* Device::CreateRecvTransport(
 	  RecvTransport::Listener* listener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const std::string& id,
 	  const json& iceParameters,
 	  const json& iceCandidates,
@@ -197,6 +200,7 @@ namespace mediasoupclient
 		// Create a new Transport.
 		auto* transport = new RecvTransport(
 		  listener,
+		  privateAudioObserver,
 		  id,
 		  iceParameters,
 		  iceCandidates,
@@ -221,6 +225,6 @@ namespace mediasoupclient
 		MSC_TRACE();
 
 		return Device::CreateRecvTransport(
-		  listener, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
+		  listener,nullptr, id, iceParameters, iceCandidates, dtlsParameters, nullptr, peerConnectionOptions, appData);
 	}
 } // namespace mediasoupclient

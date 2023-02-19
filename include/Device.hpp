@@ -24,6 +24,7 @@ namespace mediasoupclient
 		bool CanProduce(const std::string& kind);
 		SendTransport* CreateSendTransport(
 		  SendTransport::Listener* listener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,
@@ -41,6 +42,7 @@ namespace mediasoupclient
 		  const nlohmann::json& appData                        = nlohmann::json::object()) const;
 		RecvTransport* CreateRecvTransport(
 		  RecvTransport::Listener* listener,
+		  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 		  const std::string& id,
 		  const nlohmann::json& iceParameters,
 		  const nlohmann::json& iceCandidates,

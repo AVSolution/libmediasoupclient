@@ -122,6 +122,7 @@ namespace mediasoupclient
 
 	SendTransport::SendTransport(
 	  Listener* listener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const std::string& id,
 	  const json& iceParameters,
 	  const json& iceCandidates,
@@ -158,6 +159,7 @@ namespace mediasoupclient
 
 		this->sendHandler.reset(new SendHandler(
 		  dynamic_cast<SendHandler::PrivateListener*>(this),
+		  privateAudioObserver,
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,
@@ -371,6 +373,7 @@ namespace mediasoupclient
 
 	RecvTransport::RecvTransport(
 	  Listener* listener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const std::string& id,
 	  const json& iceParameters,
 	  const json& iceCandidates,
@@ -387,6 +390,7 @@ namespace mediasoupclient
 
 		this->recvHandler.reset(new RecvHandler(
 		  dynamic_cast<RecvHandler::PrivateListener*>(this),
+		  privateAudioObserver,
 		  iceParameters,
 		  iceCandidates,
 		  dtlsParameters,

@@ -10,6 +10,7 @@
 #include <api/video_codecs/builtin_video_decoder_factory.h>
 #include <api/video_codecs/builtin_video_encoder_factory.h>
 #include <rtc_base/ssl_adapter.h>
+#include <api/task_queue/default_task_queue_factory.h>
 
 using json = nlohmann::json;
 
@@ -60,7 +61,9 @@ namespace mediasoupclient
 	/* Instance methods. */
 
 	PeerConnection::PeerConnection(
-	  PeerConnection::PrivateListener* privateListener, const PeerConnection::Options* options)
+	  PrivateListener* privateListener,
+	  const PeerConnection::Options* options,
+	  PrivateAudioObserver* pObserver)
 	{
 		MSC_TRACE();
 
@@ -90,11 +93,16 @@ namespace mediasoupclient
 				MSC_THROW_INVALID_STATE_ERROR("thread start errored");
 			}
 
+			rtc::scoped_refptr<webrtc::AudioDeviceModule> adm = webrtc::CreateAudioDeviceWithDataObserver(
+			  webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio,
+			  webrtc::CreateDefaultTaskQueueFactory().get(),
+			  std::make_unique<AudioFrameObserver>(pObserver));
+
 			this->peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
 			  this->networkThread.get(),
 			  this->workerThread.get(),
 			  this->signalingThread.get(),
-			  nullptr /*default_adm*/,
+			  adm /*default_adm*/,
 			  webrtc::CreateBuiltinAudioEncoderFactory(),
 			  webrtc::CreateBuiltinAudioDecoderFactory(),
 			  webrtc::CreateBuiltinVideoEncoderFactory(),
@@ -116,6 +124,8 @@ namespace mediasoupclient
 		MSC_TRACE();
 
 		this->pc->Close();
+		//this->pc = nullptr;
+		//this->peerConnectionFactory = nullptr;
 	}
 
 	webrtc::PeerConnectionInterface::RTCConfiguration PeerConnection::GetConfiguration() const
@@ -657,5 +667,74 @@ namespace mediasoupclient
 	void PeerConnection::PrivateListener::OnInterestingUsage(int /*usagePattern*/)
 	{
 		MSC_TRACE();
+	}
+
+	void PeerConnection::AudioFrameObserver::OnCaptureData(
+	  const void* audio_samples,
+	  const size_t num_samples,
+	  const size_t bytes_per_sample,
+	  const size_t num_channels,
+	  const uint32_t samples_per_sec)
+	{
+ //std::cout << __FUNCTION__ << ", " << num_samples << ", " << bytes_per_sample << ","<<
+ //num_channels << "," << samples_per_sec<<std::endl;//480,4,2,48000
+#if 0
+				static FILE* pFileWrite = nullptr;
+				if (pFileWrite == nullptr)
+				{
+					 std::cout << __FUNCTION__ << ", " << num_samples << ", " << bytes_per_sample << ","<<
+					 num_channels << "," << samples_per_sec<<std::endl;
+					pFileWrite = fopen("microphone.pcm", "wb");
+				}
+				if (pFileWrite)
+				{
+					size_t nDataLen = num_samples * bytes_per_sample * num_channels / 2;
+					fwrite(audio_samples, nDataLen, 1,pFileWrite);
+				}
+#endif
+#if 0
+				static unsigned char *pTemp = new unsigned char[480 * 2 * 4 +1];
+				static FILE* pFileRead = nullptr;
+				size_t dataLen              = bytes_per_sample * num_samples * num_channels / 2;
+				if (pFileRead == nullptr)
+				{
+					pFileRead = fopen("48000_2_16.pcm", "rb+");
+				}
+				if (pFileRead)
+				{
+					size_t nLen = fread((void*)audio_samples, 1, dataLen, pFileRead);
+					if (nLen > 0)
+					{
+					
+					}
+					printf("%s len: %d\n", "read 48000_2_16.pcm", (int)nLen);
+					if (nLen == 0)
+					{
+						fseek(pFileRead, 0, SEEK_SET);
+						nLen = fread((void*)pTemp, 1, dataLen, pFileRead);
+					}
+				}
+				else
+				{
+					printf("file1 or file2 is open failed\n");
+				}
+#endif
+		if (pObserver_)
+			pObserver_->onCaptureAudioFrame(
+			  audio_samples, num_samples, bytes_per_sample/num_channels, num_channels, samples_per_sec);
+	}
+
+	void PeerConnection::AudioFrameObserver::OnRenderData(
+		const void* audio_samples,
+		const size_t num_samples,
+		const size_t bytes_per_sample,
+		const size_t num_channels,
+		const uint32_t samples_per_sec)
+	{
+		//std::cout << __FUNCTION__ << "," << num_samples << "," << bytes_per_sample << ","
+		 //         << num_channels <<"," << samples_per_sec << std::endl;//480,4,2,48000
+		if (pObserver_)
+			pObserver_->onPlaybackAudioFrame(
+			  audio_samples, num_samples, bytes_per_sample/num_channels, num_channels, samples_per_sec);	
 	}
 } // namespace mediasoupclient

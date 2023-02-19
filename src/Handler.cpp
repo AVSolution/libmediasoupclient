@@ -59,6 +59,7 @@ namespace mediasoupclient
 
 	Handler::Handler(
 	  PrivateListener* privateListener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
@@ -68,7 +69,7 @@ namespace mediasoupclient
 	{
 		MSC_TRACE();
 
-		this->pc.reset(new PeerConnection(this, peerConnectionOptions));
+		this->pc.reset(new PeerConnection(this, peerConnectionOptions, privateAudioObserver));
 
 		this->remoteSdp.reset(
 		  new Sdp::RemoteSdp(iceParameters, iceCandidates, dtlsParameters, sctpParameters));
@@ -143,6 +144,7 @@ namespace mediasoupclient
 
 	SendHandler::SendHandler(
 	  Handler::PrivateListener* privateListener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
@@ -151,7 +153,13 @@ namespace mediasoupclient
 	  const json& sendingRtpParametersByKind,
 	  const json& sendingRemoteRtpParametersByKind)
 	  : Handler(
-	      privateListener, iceParameters, iceCandidates, dtlsParameters, sctpParameters, peerConnectionOptions)
+	      privateListener,
+	      privateAudioObserver,
+		  iceParameters,
+	      iceCandidates,
+	      dtlsParameters,
+	      sctpParameters,
+	      peerConnectionOptions)
 	{
 		MSC_TRACE();
 
@@ -567,13 +575,20 @@ namespace mediasoupclient
 
 	RecvHandler::RecvHandler(
 	  Handler::PrivateListener* privateListener,
+	  PeerConnection::PrivateAudioObserver* privateAudioObserver,
 	  const json& iceParameters,
 	  const json& iceCandidates,
 	  const json& dtlsParameters,
 	  const json& sctpParameters,
 	  const PeerConnection::Options* peerConnectionOptions)
 	  : Handler(
-	      privateListener, iceParameters, iceCandidates, dtlsParameters, sctpParameters, peerConnectionOptions)
+	      privateListener,
+	      privateAudioObserver,
+		  iceParameters,
+	      iceCandidates,
+	      dtlsParameters,
+	      sctpParameters,
+	      peerConnectionOptions)
 	{
 		MSC_TRACE();
 	};
